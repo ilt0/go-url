@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URL Shortener</title>
+</head>
+<body>
+    <h1>URL Shortener</h1>
+    <form id="shortenForm">
+        <label for="url">Enter the URL:</label>
+        <input type="text" id="url" name="url" required>
+        <button type="submit">Shorten</button>
+    </form>
+    <div id="shortenedURLContainer">
+        <p>Shortened URL: <a id="shortenedURL" href=""></a></p>
+    </div>
+
+    <script>
+        const shortenForm = document.getElementById("shortenForm");
+        const shortenedURLContainer = document.getElementById("shortenedURLContainer");
+        const shortenedURL = document.getElementById("shortenedURL");
+
+        shortenForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const url = formData.get("url");
+
+            try {
+                const response = await fetch("/shorten", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ url }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to shorten URL");
+                }
+
+                const data = await response.json();
+                shortenedURL.href = data.short_url;
+                shortenedURL.innerText = data.short_url;
+                shortenedURLContainer.style.display = "block";
+            } catch (error) {
+                alert("Failed to shorten URL");
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>
